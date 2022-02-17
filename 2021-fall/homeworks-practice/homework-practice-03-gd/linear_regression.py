@@ -11,11 +11,15 @@ class LinearRegression:
         self.parameters_ = None
 
     def fit(self, X: np.ndarray, y: np.ndarray, **procedure_config):
-        self.parameters_ = self.solver_.descent(X, y, **procedure_config)
+#         adding one-vector for free-weight(bias w0)
+        new_shape = tuple(X.shape[i] if i < len(X.shape) - 1 else X.shape[i]+1 for i in range(len(X.shape)))
+        features: np.ndarray = np.empty(new_shape)
+        features[...,:-1] = X; features[..., -1] = np.ones(X.shape[:-1])
+        self.parameters_ = self.solver_.descent(features, y, **procedure_config)
         return self
 
     def predict(self, X: np.ndarray) -> np.ndarray:
-        return np.dot(X, self.parameters_)
+        return np.dot(X, self.parameters_[..., :-1]) + self.parameters_[..., -1]
 
 
 class Ridge:
@@ -27,52 +31,12 @@ class Ridge:
         self.parameters_ = None
 
     def fit(self, X: np.ndarray, y: np.ndarray, **procedure_config):
-        self.parameters_ = self.solver_.descent(X, y, **procedure_config)
+#         adding one-vector for free-weight(bias w0)
+        new_shape = tuple(X.shape[i] if i < len(X.shape) - 1 else X.shape[i]+1 for i in range(len(X.shape)))
+        features: np.ndarray = np.empty(new_shape)
+        features[...,:-1] = X; features[..., -1] = np.ones(X.shape[:-1])
+        self.parameters_ = self.solver_.descent(features, y, **procedure_config)
         return self
 
     def predict(self, X: np.ndarray) -> np.ndarray:
-        return np.dot(X, self.parameters_)
-
-# class LinearRegression:
-#     """
-#     Linear regression class
-#     """
-#
-#     def __init__(self, descent_config: dict, tolerance: float = 1e-4, max_iter: int = 300):
-#         """
-#         :param descent_config: gradient descent config
-#         :param tolerance: stopping criterion for square of euclidean norm of weight difference (float)
-#         :param max_iter: stopping criterion for iterations (int)
-#         """
-#         self.descent: BaseDescent = get_descent(descent_config)
-#
-#         self.tolerance: float = tolerance
-#         self.max_iter: int = max_iter
-#
-#         self.loss_history: List[float] = []
-#
-#     def fit(self, x: np.ndarray, y: np.ndarray) -> LinearRegression:
-#         """
-#         Fitting descent weights for x and y dataset
-#         :param x: features array
-#         :param y: targets array
-#         :return: self
-#         """
-#         # TODO: fit weights to x and y
-#         raise NotImplementedError('LinearRegression fit function not implemented')
-#
-#     def predict(self, x: np.ndarray) -> np.ndarray:
-#         """
-#         Predicting targets for x dataset
-#         :param x: features array
-#         :return: prediction: np.ndarray
-#         """
-#         return self.descent.predict(x)
-#
-#     def calc_loss(self, x: np.ndarray, y: np.ndarray) -> float:
-#         """
-#         Calculating loss for x and y dataset
-#         :param x: features array
-#         :param y: targets array
-#         """
-#         return self.descent.calc_loss(x, y)
+        return np.dot(X, self.parameters_[..., :-1]) + self.parameters_[..., -1]
