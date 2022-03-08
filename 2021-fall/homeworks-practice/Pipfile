@@ -11,6 +11,7 @@ scipy = "*"
 scikit-learn = "*"
 jupyterlab = "*"
 seaborn = "*"
+pyppeteer = "*"
 
 [dev-packages]
 
